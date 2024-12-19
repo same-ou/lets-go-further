@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"fmt"
 	"net/http"
-
+	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -17,4 +17,26 @@ func (app *application) readIDParam(r *http.Request) (int64, error) {
 	}
 
 	return id, nil
+}
+
+type envlope map[string]interface{}
+
+func (app *application) writeJSON(rw http.ResponseWriter, status int, data envlope, headers http.Header) error {
+	js, err := json.MarshalIndent(data, "", "\t")
+
+	if err != nil {
+		return err
+	}
+
+	js = append(js, '\n')
+
+	for key, value := range headers {
+		rw.Header()[key] = value
+	}
+
+	rw.Header().Set("Content-Type", "application/json")
+	rw.WriteHeader(status)
+	rw.Write(js)
+
+	return nil
 }

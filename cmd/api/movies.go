@@ -1,11 +1,10 @@
 package main
 
 import (
-	"strconv"
-	"fmt"
 	"net/http"
+	"time"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/same-ou/lets-go-further/internal/data"
 )
 
 func (app *application) createMovieHandler(rw http.ResponseWriter, r *http.Request) {
@@ -15,10 +14,25 @@ func (app *application) createMovieHandler(rw http.ResponseWriter, r *http.Reque
 func (app *application) showMovieHandler(rw http.ResponseWriter, r *http.Request) {
 	id, err := app.readIDParam(r)
 	if err != nil || id < 1 {
-		http.NotFound(rw, r)
+		app.notFoundResponse(rw, r)
 		return
 	}
 
-	fmt.Fprintf(rw, "Show the details of movie %d\n", id)
+	movie := data.Movie{
+		ID: id,
+		Title: "Casablanca",
+		Year: 1942,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Runtime: 102,
+		Genres: []string{"drama", "romance", "war"},
+		Version: 1,
+	}
+
+	err = app.writeJSON(rw, http.StatusOK, envlope{"movie":movie}, nil)
+	if err != nil {
+		app.serverErrorResponse(rw, r, err)
+		return
+	}
 
 }
