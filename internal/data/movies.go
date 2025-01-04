@@ -1,0 +1,17 @@
+package data
+
+
+import "time"
+
+// Movie defines the structure for an API movie
+
+type Movie struct {
+	ID int64 `json:"id"`
+	Title string `json:"title"`
+	Year int32 `json:"year,omitempty"`
+	Runtime Runtime `json:"runtime,omitempty"`
+	Genres []string `json:"genres,omitempty"`
+	Version int32 `json:"version"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
