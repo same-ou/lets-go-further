@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+
 func (app *application) logError(r *http.Request, err error) {
 	app.logger.Println(err)
 }
@@ -31,4 +32,17 @@ func (app *application) notFoundResponse(rw http.ResponseWriter, r *http.Request
 func (app *application) methodNotAllowedResponse(rw http.ResponseWriter, r *http.Request) {
 	message := fmt.Sprintf("The %s method is not supported by this resource", r.Method)
 	app.errorResponse(rw, r, http.StatusMethodNotAllowed, message)
+}
+
+func (app *application) badRequestResponse(rw http.ResponseWriter, r *http.Request, err error) {
+	app.errorResponse(rw, r, http.StatusBadRequest, err.Error())
+}
+
+
+func (app *application) failedValidationResponse(rw http.ResponseWriter, r *http.Request, errors map[string]string) {
+	env := envlope{"errors": errors} // Wrap the errors in an envelope structure
+	err := app.writeJSON(rw, http.StatusUnprocessableEntity, env, nil)
+	if err != nil {
+		app.serverErrorResponse(rw, r, err)
+	}
 }
